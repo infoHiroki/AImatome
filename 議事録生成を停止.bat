@@ -1,10 +1,13 @@
 @echo off
-cd /d "%~dp0システム"
+chcp 932
 echo 議事録自動生成を停止します...
-for /f "tokens=2" %%i in ('tasklist ^| findstr python') do (
-    taskkill /PID %%i /F >nul 2>&1
-)
+
+echo Pythonプロセスを停止中...
+taskkill /F /IM python.exe /T 2>nul
+taskkill /F /IM pythonw.exe /T 2>nul
+
 echo.
 echo 停止しました。
+echo 「現在の状態.txt」で状況を確認できます。
 echo.
 pause
