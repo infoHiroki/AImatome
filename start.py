@@ -239,7 +239,7 @@ def main():
         
         # キー入力を待機
         start_time = time.time()
-        while time.time() - start_time < 1:  # 1秒間キー入力をチェック
+        while time.time() - start_time < 60:  # 60秒間キー入力をチェック
             if msvcrt.kbhit():
                 key = msvcrt.getch().decode('utf-8', errors='ignore').lower()
                 if key == 'q':  # 終了
