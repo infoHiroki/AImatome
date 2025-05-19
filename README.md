@@ -1,131 +1,95 @@
-# 議事録自動生成ツール
+# AImatome - 議事録自動生成システム
 
-GPT-4 APIを使って、会議の文字起こしから議事録を自動生成します。
+## 概要
+AImatomeは、文字起こしファイルから自動で議事録を生成するシステムです。  
+一般ユーザー向けの簡単なUIを備え、技術知識がなくても使用できます。
 
-## セットアップ
+## 特徴
+- 🎯 文字起こしファイル(.txt)からAIを使って議事録を自動生成
+- 🔄 フォルダ監視による自動処理（30分ごと）
+- 📊 日本語表示の状態確認
+- 💻 Windows/macOS対応の起動・停止スクリプト
+- 🚀 プログラミング知識不要
 
-1. Pythonライブラリをインストール
-```bash
-pip install -r requirements.txt
-```
+## 一般ユーザー向け 使い方
 
-2. APIキーを設定（以下のいずれかの方法）
-
-### 方法1: .envファイル（推奨）
-`.env`ファイルを作成して、以下を記入：
+### 1. 初期設定（初回のみ）
+`システム/.env` ファイルを作成し、OpenAI APIキーを設定：
 ```
 OPENAI_API_KEY=あなたのAPIキー
 ```
 
-### 方法2: 環境変数
-```bash
-export OPENAI_API_KEY="あなたのAPIキー"
+### 2. システムの起動
+- **Windows**: `議事録生成を開始.bat` をダブルクリック
+- **Mac**: `議事録生成を開始.command` をダブルクリック
+
+### 3. ファイルの処理
+1. `文字起こし入力` フォルダに文字起こしファイル（.txt）を配置
+2. 30分ごとに自動チェック・処理
+3. `完成した議事録` フォルダに結果が保存される
+4. 処理済みファイルは `処理済み` フォルダに移動
+
+### 4. 状態確認
+`現在の状態.txt` を開いて処理状況やエラーを確認
+
+### 5. システムの停止
+- **Windows**: `議事録生成を停止.bat` をダブルクリック
+- **Mac**: `議事録生成を停止.command` をダブルクリック
+
+## フォルダ構成
+```
+AImatome/
+├── 文字起こし入力/        # 入力ファイルを配置
+├── 完成した議事録/        # 生成された議事録
+├── 処理済み/             # 処理後の元ファイル
+├── システム/             # システムファイル（触らない）
+│   ├── auto_processor.py
+│   ├── auto_config.json
+│   ├── .env.sample
+│   └── その他設定ファイル
+├── 議事録生成を開始.*     # 起動スクリプト
+├── 議事録生成を停止.*     # 停止スクリプト
+├── 現在の状態.txt        # 状態表示
+└── 使い方.txt           # 使用方法ガイド
 ```
 
-3. フォルダ設定
-`config.json`ファイルでフォルダを指定：
-```json
-{
-  "input_folder": "transcripts",
-  "output_folder": "minutes"
-}
+## 開発者向け情報
+
+### 必要な環境
+- Python 3.8以上
+- OpenAI API キー
+
+### セットアップ
+1. 依存ライブラリのインストール
+```bash
+pip install -r requirements.txt
 ```
 
-## 使い方
+2. APIキーの設定
+`.env`ファイルを作成：
+```
+OPENAI_API_KEY=あなたのAPIキー
+```
 
-### 自動処理版（24時間監視）
-
-音声データから文字起こし→議事録作成を完全自動化する場合：
-
-1. 自動処理を開始
+### 直接実行
 ```bash
+cd システム
 python auto_processor.py
 ```
 
-2. 設定（`auto_config.json`）
+### 設定ファイル
+- `auto_config.json`: メイン設定ファイル
 ```json
 {
-  "watch_folder": "transcripts",   // 監視フォルダ（文字起こし結果）
-  "output_folder": "minutes",      // 出力フォルダ（議事録）
-  "processed_folder": "processed", // 処理済みファイル保管
-  "check_interval": 1800          // チェック間隔（秒）30分
+  "watch_folder": "文字起こし入力",
+  "output_folder": "完成した議事録",
+  "processed_folder": "処理済み",
+  "check_interval": 1800,
+  "system_prompt": "議事録生成プロンプト..."
 }
 ```
 
-**動作の流れ：**
-1. `transcripts/`フォルダに新しいテキストファイルが見つかる
-2. 議事録を生成して`minutes/`に保存
-3. 元ファイルを`processed/`に移動（重複処理防止）
-
-**特徴：**
-- シンプルで確実な重複処理防止
-- ファイルシステムベースの状態管理
-- 処理状態が目で見える
-- ログファイル（`auto_processor.log`）に全記録
-
-### WebUI版（手動操作）
-
-1. WebUIを起動
-```bash
-python webapp.py
-```
-
-2. ブラウザでアクセス
-```
-http://localhost:5000
-```
-
-3. WebUIから操作
-- 入力・出力フォルダを設定
-- 「処理を開始」ボタンをクリック
-- リアルタイムで進捗を確認
-- 完成した議事録をダウンロード
-
-### コマンドライン版
-
-```bash
-python minutes_generator.py
-```
-
-これで`config.json`で指定した入力フォルダ内のすべての.txtファイルを処理し、出力フォルダに議事録を保存します。
-
-## 実行例
-
-```bash
-# config.jsonで "input_folder": "transcripts", "output_folder": "minutes" を設定
-
-python minutes_generator.py
-
-# 実行結果:
-# 2個のファイルを処理します...
-# 処理中: sample_transcript.txt
-# 議事録を作成しました: minutes/sample_transcript_議事録.txt
-# 処理中: medical_transcript.txt  
-# 議事録を作成しました: minutes/medical_transcript_議事録.txt
-# 完了: 2/2個のファイルを処理しました
-```
-
-## ファイル構成
-
-```
-project/
-├── webapp.py             # WebUIアプリケーション（新機能）
-├── minutes_generator.py  # コマンドライン版
-├── config.json          # フォルダ設定
-├── .env                 # APIキー設定（Gitから除外）
-├── requirements.txt     # 必要なライブラリ
-├── templates/           # HTMLテンプレート
-│   └── index.html      # WebUI画面
-├── transcripts/         # 入力フォルダ（文字起こしファイル）
-│   ├── sample_transcript.txt
-│   └── medical_transcript.txt
-└── minutes/             # 出力フォルダ（議事録）
-    ├── sample_transcript_議事録.txt
-    └── medical_transcript_議事録.txt
-```
-
-## 生成される議事録の形式
-
+### 生成される議事録の形式
 ```
 # 議事録
 ## 日時・参加者
@@ -136,7 +100,16 @@ project/
 ## 次回予定
 ```
 
-## セキュリティについて
+## トラブルシューティング
+- エラーが発生した場合は `現在の状態.txt` を確認
+- APIキーが正しく設定されているか確認
+- Python環境とライブラリがインストールされているか確認
+- `システム/auto_processor.log` で詳細なログを確認
 
+## セキュリティについて
 - APIキーは絶対にGitHubなどに公開しないでください
-- `.gitignore`ファイルに`.env`が含まれているので、.envファイルは自動的にGitから除外されます
+- `.gitignore`ファイルに`.env`が含まれています
+- 処理済みファイルは自動的に別フォルダに移動されます
+
+## ライセンス
+MIT
