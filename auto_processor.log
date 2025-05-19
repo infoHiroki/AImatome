@@ -1,0 +1,60 @@
+2025-05-18 17:05:09,911 - INFO - 自動処理を開始（チェック間隔: 1800秒）
+2025-05-18 17:05:09,912 - INFO - 新しいファイルはありません
+2025-05-18 17:05:09,912 - INFO - 次のチェックまで1800秒待機...
+2025-05-18 17:35:10,013 - INFO - 6個のファイルを発見
+2025-05-18 17:35:15,024 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250321_010517.txt
+2025-05-18 17:35:24,155 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 17:35:24,160 - INFO - 議事録を保存: minutes/R20250321_010517_議事録.txt
+2025-05-18 17:35:24,160 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250321_010517.txt → processed/R20250321_010517.txt
+2025-05-18 17:35:29,162 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250321_010303.txt
+2025-05-18 17:35:39,199 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 17:35:39,207 - INFO - 議事録を保存: minutes/R20250321_010303_議事録.txt
+2025-05-18 17:35:39,207 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250321_010303.txt → processed/R20250321_010303.txt
+2025-05-18 17:35:44,208 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250326_215918.txt
+2025-05-18 17:36:07,470 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 17:36:07,472 - INFO - 議事録を保存: minutes/R20250326_215918_議事録.txt
+2025-05-18 17:36:07,472 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250326_215918.txt → processed/R20250326_215918.txt
+2025-05-18 17:36:12,475 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/TestShortのコピー.txt
+2025-05-18 17:36:20,168 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 17:36:20,169 - INFO - 議事録を保存: minutes/TestShortのコピー_議事録.txt
+2025-05-18 17:36:20,169 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/TestShortのコピー.txt → processed/TestShortのコピー.txt
+2025-05-18 17:36:25,179 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/TestShort.txt
+2025-05-18 17:36:33,478 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 17:36:33,480 - INFO - 議事録を保存: minutes/TestShort_議事録.txt
+2025-05-18 17:36:33,480 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/TestShort.txt → processed/TestShort.txt
+2025-05-18 17:36:38,490 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/TestShortのコピー2.txt
+2025-05-18 17:36:46,424 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 17:36:46,425 - INFO - 議事録を保存: minutes/TestShortのコピー2_議事録.txt
+2025-05-18 17:36:46,425 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/TestShortのコピー2.txt → processed/TestShortのコピー2.txt
+2025-05-18 17:36:46,425 - INFO - 次のチェックまで1800秒待機...
+2025-05-18 18:06:46,377 - INFO - 1個のファイルを発見
+2025-05-18 18:06:51,379 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250319_010115.txt
+2025-05-18 18:07:13,151 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 18:07:13,153 - INFO - 議事録を保存: minutes/R20250319_010115_議事録.txt
+2025-05-18 18:07:13,154 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250319_010115.txt → processed/R20250319_010115.txt
+2025-05-18 18:07:13,154 - INFO - 次のチェックまで1800秒待機...
+2025-05-18 18:37:13,268 - INFO - 4個のファイルを発見
+2025-05-18 18:37:18,269 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250321_010517.txt
+2025-05-18 18:37:29,010 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 18:37:29,017 - INFO - 議事録を保存: minutes/R20250321_010517_議事録.txt
+2025-05-18 18:37:29,018 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250321_010517.txt → processed/R20250321_010517.txt
+2025-05-18 18:37:34,023 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250321_010303.txt
+2025-05-18 18:37:45,262 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 18:37:45,264 - INFO - 議事録を保存: minutes/R20250321_010303_議事録.txt
+2025-05-18 18:37:45,265 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250321_010303.txt → processed/R20250321_010303.txt
+2025-05-18 18:37:50,267 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250326_215918.txt
+2025-05-18 18:38:06,094 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 18:38:06,097 - INFO - 議事録を保存: minutes/R20250326_215918_議事録.txt
+2025-05-18 18:38:06,097 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250326_215918.txt → processed/R20250326_215918.txt
+2025-05-18 18:38:11,102 - INFO - 処理開始: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250319_010115.txt
+2025-05-18 18:38:35,129 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-18 18:38:35,132 - INFO - 議事録を保存: minutes/R20250319_010115_議事録.txt
+2025-05-18 18:38:35,133 - INFO - ファイルを移動: /Users/hirokitakamura/Documents/Dev/KoeMojiAuto/output/R20250319_010115.txt → processed/R20250319_010115.txt
+2025-05-18 18:38:35,133 - INFO - 次のチェックまで1800秒待機...
+2025-05-18 19:08:35,179 - INFO - 新しいファイルはありません
+2025-05-18 19:08:35,180 - INFO - 次のチェックまで1800秒待機...
+2025-05-18 19:37:55,817 - INFO - 処理を停止します
+2025-05-19 13:21:36,888 - INFO - 自動処理を開始（チェック間隔: 1800秒）
+2025-05-19 13:21:36,888 - INFO - 新しいファイルはありません
+2025-05-19 13:21:36,888 - INFO - 次のチェックまで1800秒待機...
+2025-05-19 13:21:50,767 - INFO - 処理を停止します

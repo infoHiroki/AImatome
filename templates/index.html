@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>議事録自動生成システム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #34495e;
+        }
+        
+        .folder-input {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .folder-input label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .folder-input input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .file-item {
+            padding: 8px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-info {
+            color: #777;
+            font-size: 12px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-primary:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .progress-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #3498db;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .current-file {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .results {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .result-item {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .result-item.success {
+            background-color: #e8f5e9;
+        }
+        
+        .result-item.error {
+            background-color: #ffebee;
+        }
+        
+        .download-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .download-link:hover {
+            text-decoration: underline;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: white;
+        }
+        
+        .connection-status.connected {
+            background-color: #27ae60;
+        }
+        
+        .connection-status.error {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>議事録自動生成システム</h1>
+        </header>
+        
+        <div class="main-content">
+            <div class="card">
+                <h2>設定</h2>
+                <div class="folder-input">
+                    <label for="input-folder">入力フォルダ</label>
+                    <input type="text" id="input-folder" value="{{ config.input_folder }}">
+                    
+                    <label for="output-folder">出力フォルダ</label>
+                    <input type="text" id="output-folder" value="{{ config.output_folder }}">
+                </div>
+                
+                <button class="btn btn-primary" id="process-btn" onclick="startProcessing()">
+                    処理を開始
+                </button>
+            </div>
+            
+            <div class="card">
+                <h2>入力ファイル一覧</h2>
+                <div class="file-list" id="input-files">
+                    <div class="file-item">ファイルを読み込み中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-section hidden" id="progress-section">
+            <h2>処理状況</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill">0%</div>
+            </div>
+            <div class="current-file" id="current-file"></div>
+        </div>
+        
+        <div class="results hidden" id="results-section">
+            <h2>処理結果</h2>
+            <div id="results-list"></div>
+        </div>
+    </div>
+    
+    <div class="connection-status connected" id="connection-status">
+        接続中
+    </div>
+    
+    <script>
+        let processingInterval = null;
+        let connectionCheckInterval = null;
+        
+        // ページ読み込み時に入力ファイル一覧を取得
+        window.onload = function() {
+            loadInputFiles();
+            // 接続状態を定期的に確認（30秒ごと）
+            connectionCheckInterval = setInterval(checkConnection, 30000);
+        };
+        
+        function checkConnection() {
+            fetch('/status', { method: 'HEAD' })
+                .then(() => {
+                    document.getElementById('connection-status').className = 'connection-status connected';
+                    document.getElementById('connection-status').textContent = '接続中';
+                })
+                .catch(() => {
+                    document.getElementById('connection-status').className = 'connection-status error';
+                    document.getElementById('connection-status').textContent = '接続エラー';
+                });
+        }
+        
+        function loadInputFiles() {
+            const inputFolder = document.getElementById('input-folder').value;
+            fetch(`/files/${encodeURIComponent(inputFolder)}`)
+                .then(response => response.json())
+                .then(files => {
+                    const fileList = document.getElementById('input-files');
+                    if (files.length === 0) {
+                        fileList.innerHTML = '<div class="file-item">ファイルが見つかりません</div>';
+                    } else {
+                        fileList.innerHTML = files.map(file => `
+                            <div class="file-item">
+                                <span>${file.name}</span>
+                                <span class="file-info">${(file.size / 1024).toFixed(1)} KB</span>
+                            </div>
+                        `).join('');
+                    }
+                });
+        }
+        
+        function startProcessing() {
+            const inputFolder = document.getElementById('input-folder').value;
+            const outputFolder = document.getElementById('output-folder').value;
+            
+            // ボタンを無効化
+            document.getElementById('process-btn').disabled = true;
+            
+            // 進捗セクションを表示
+            document.getElementById('progress-section').classList.remove('hidden');
+            document.getElementById('results-section').classList.add('hidden');
+            
+            // 処理を開始
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    input_folder: inputFolder,
+                    output_folder: outputFolder
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    document.getElementById('process-btn').disabled = false;
+                    document.getElementById('progress-section').classList.add('hidden');
+                } else {
+                    // 進捗を定期的に確認
+                    processingInterval = setInterval(checkProgress, 1000);
+                }
+            });
+        }
+        
+        function checkProgress() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(status => {
+                    if (status.total_count > 0) {
+                        const progress = (status.processed_count / status.total_count * 100).toFixed(0);
+                        document.getElementById('progress-fill').style.width = progress + '%';
+                        document.getElementById('progress-fill').textContent = progress + '%';
+                    }
+                    
+                    if (status.current_file) {
+                        document.getElementById('current-file').textContent = 
+                            `処理中: ${status.current_file}`;
+                    }
+                    
+                    if (!status.is_processing && status.results.length > 0) {
+                        // 処理完了
+                        clearInterval(processingInterval);
+                        showResults(status.results);
+                        document.getElementById('process-btn').disabled = false;
+                        document.getElementById('current-file').textContent = '処理完了';
+                    }
+                });
+        }
+        
+        function showResults(results) {
+            const resultsSection = document.getElementById('results-section');
+            const resultsList = document.getElementById('results-list');
+            
+            resultsList.innerHTML = results.map(result => `
+                <div class="result-item ${result.success ? 'success' : 'error'}">
+                    <span>${result.file}</span>
+                    ${result.success ? 
+                        `<a href="/download/${encodeURIComponent(result.output.split('/').slice(0, -1).join('/'))}/${encodeURIComponent(result.output.split('/').pop())}" 
+                           class="download-link">ダウンロード</a>` : 
+                        `<span style="color: red;">${result.output}</span>`
+                    }
+                </div>
+            `).join('');
+            
+            resultsSection.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
