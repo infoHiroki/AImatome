@@ -14,43 +14,40 @@ AImatomeは、文字起こしファイルから自動で議事録を生成する
 ## 一般ユーザー向け 使い方
 
 ### 1. 初期設定（初回のみ）
-「APIキー設定方法.txt」を参照して、`システム/.env` ファイルにAPIキーを設定：
+「APIキー設定方法.txt」を参照して、`system/.env` ファイルにAPIキーを設定：
 ```
 OPENAI_API_KEY=あなたのAPIキー
 ```
 
 ### 2. システムの起動
-- **Windows**: `議事録生成を開始.bat` をダブルクリック
-- **Mac**: `議事録生成を開始.command` をダブルクリック
+- **Windows**: `start.bat` をダブルクリック
+- **Mac**: `start.command` をダブルクリック
 
 ### 3. ファイルの処理
-1. `文字起こし入力` フォルダに文字起こしファイル（.txt）を配置
+1. `input` フォルダに文字起こしファイル（.txt）を配置
 2. 30分ごとに自動チェック・処理
-3. `完成した議事録` フォルダに結果が保存される
-4. 処理済みファイルは `処理済み` フォルダに移動
+3. `output` フォルダに結果が保存される
+4. 処理済みファイルは `archive` フォルダに移動
 
 ### 4. 状態確認
-`現在の状態.txt` を開いて処理状況やエラーを確認
+`status.txt` を開いて処理状況やエラーを確認
 
 ### 5. システムの停止
-- **Windows**: `議事録生成を停止.bat` をダブルクリック
-- **Mac**: `議事録生成を停止.command` をダブルクリック
+- システムを停止するには、起動時に開いたコマンドウィンドウを閉じるだけです。
 
 ## フォルダ構成
 ```
 AImatome/
-├── 文字起こし入力/        # 入力ファイルを配置
-├── 完成した議事録/        # 生成された議事録
-├── 処理済み/             # 処理後の元ファイル
-├── システム/             # システムファイル（触らない）
+├── input/               # 入力ファイルを配置
+├── output/              # 生成された議事録
+├── archive/             # 処理後の元ファイル
+├── system/              # システムファイル（触らない）
 │   ├── auto_processor.py
 │   ├── auto_config.json
-│   ├── .env.sample
+│   ├── .env
 │   └── その他設定ファイル
-├── 議事録生成を開始.*     # 起動スクリプト
-├── 議事録生成を停止.*     # 停止スクリプト
-├── 現在の状態.txt        # 状態表示
-└── 使い方.txt           # 使用方法ガイド
+├── start.*              # 起動スクリプト
+└── status.txt           # 状態表示
 ```
 
 ## 開発者向け情報
@@ -73,7 +70,7 @@ OPENAI_API_KEY=あなたのAPIキー
 
 ### 直接実行
 ```bash
-cd システム
+cd system
 python auto_processor.py
 ```
 
@@ -81,9 +78,9 @@ python auto_processor.py
 - `auto_config.json`: メイン設定ファイル
 ```json
 {
-  "watch_folder": "文字起こし入力",
-  "output_folder": "完成した議事録",
-  "processed_folder": "処理済み",
+  "watch_folder": "input",
+  "output_folder": "output",
+  "processed_folder": "archive",
   "check_interval": 1800,
   "system_prompt": "議事録生成プロンプト..."
 }
@@ -101,10 +98,10 @@ python auto_processor.py
 ```
 
 ## トラブルシューティング
-- エラーが発生した場合は `現在の状態.txt` を確認
+- エラーが発生した場合は `status.txt` を確認
 - APIキーが正しく設定されているか確認
 - Python環境とライブラリがインストールされているか確認
-- `システム/auto_processor.log` で詳細なログを確認
+- `system/auto_processor.log` で詳細なログを確認
 
 ## セキュリティについて
 - APIキーは絶対にGitHubなどに公開しないでください

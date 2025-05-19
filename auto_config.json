@@ -1,0 +1,7 @@
+{
+  "watch_folder": "input",
+  "output_folder": "output",
+  "processed_folder": "archive",
+  "check_interval": 1800,
+  "system_prompt": "会議の文字起こしから議事録を作成してください。以下の形式で：\n\n# 議事録\n## 日時・参加者\n## 議題\n## 決定事項\n## アクションアイテム\n- 誰が、何を、いつまでに\n## 次回予定"
+}
