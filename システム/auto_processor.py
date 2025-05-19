@@ -4,10 +4,11 @@ import json
 import time
 import glob
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import openai
 import logging
+import sys
 
 # .envファイルから環境変数を読み込む
 load_dotenv()
@@ -25,13 +26,43 @@ logging.basicConfig(
     ]
 )
 
+# 状態管理
+status_data = {
+    "is_running": False,
+    "last_check": None,
+    "next_check": None,
+    "processed_count": 0,
+    "error_count": 0,
+    "last_error": None
+}
+
+def update_status_file():
+    """ユーザー向けの状態ファイルを更新"""
+    try:
+        status_text = f"""議事録自動生成システム 状態確認
+=================================
+状態: {'実行中' if status_data['is_running'] else '停止中'}
+最終チェック: {status_data['last_check'].strftime('%Y年%m月%d日 %H時%M分') if status_data['last_check'] else 'まだ実行されていません'}
+次回チェック: {status_data['next_check'].strftime('%Y年%m月%d日 %H時%M分') if status_data['next_check'] else '---'}
+処理済みファイル数: {status_data['processed_count']}個
+エラー数: {status_data['error_count']}個
+最終エラー: {status_data['last_error'] or 'なし'}
+
+更新時刻: {datetime.now().strftime('%Y年%m月%d日 %H時%M分%S秒')}
+"""
+        status_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "現在の状態.txt")
+        with open(status_path, "w", encoding="utf-8") as f:
+            f.write(status_text)
+    except Exception as e:
+        logging.error(f"状態ファイル更新エラー: {e}")
+
 def load_config():
     """設定ファイルを読み込み"""
     config_file = "auto_config.json"
     default_config = {
-        "watch_folder": "transcripts",
-        "output_folder": "minutes",
-        "processed_folder": "processed",
+        "watch_folder": "文字起こし入力",
+        "output_folder": "完成した議事録",
+        "processed_folder": "処理済み",
         "check_interval": 1800,  # 30分
         "system_prompt": "会議の文字起こしから議事録を作成してください。以下の形式で：\n\n# 議事録\n## 日時・参加者\n## 議題\n## 決定事項\n## アクションアイテム\n- 誰が、何を、いつまでに\n## 次回予定"
     }
@@ -65,6 +96,9 @@ def create_minutes(transcript_text, config):
         return response.choices[0].message.content
     except Exception as e:
         logging.error(f"API呼び出しエラー: {e}")
+        status_data['error_count'] += 1
+        status_data['last_error'] = f"API呼び出しエラー: {str(e)}"
+        update_status_file()
         return None
 
 def process_file(file_path, output_folder, processed_folder, config):
@@ -77,6 +111,9 @@ def process_file(file_path, output_folder, processed_folder, config):
             transcript = f.read()
     except Exception as e:
         logging.error(f"ファイル読み込みエラー: {file_path} - {e}")
+        status_data['error_count'] += 1
+        status_data['last_error'] = f"ファイル読み込みエラー: {os.path.basename(file_path)}"
+        update_status_file()
         return False
     
     # 議事録を生成
@@ -112,21 +149,33 @@ def process_file(file_path, output_folder, processed_folder, config):
     try:
         shutil.move(file_path, processed_path)
         logging.info(f"ファイルを移動: {file_path} → {processed_path}")
+        status_data['processed_count'] += 1
+        update_status_file()
         return True
     except Exception as e:
         logging.error(f"移動エラー: {e}")
+        status_data['error_count'] += 1
+        status_data['last_error'] = f"ファイル移動エラー: {os.path.basename(file_path)}"
+        update_status_file()
         return False
 
 def check_and_process():
     """新しいファイルをチェックして処理"""
     config = load_config()
-    watch_folder = config["watch_folder"]
-    output_folder = config["output_folder"]
-    processed_folder = config["processed_folder"]
+    watch_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), config["watch_folder"])
+    output_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), config["output_folder"])
+    processed_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), config["processed_folder"])
+    
+    # 状態を更新
+    status_data['last_check'] = datetime.now()
+    status_data['next_check'] = datetime.now() + timedelta(seconds=config["check_interval"])
+    update_status_file()
     
     # 監視フォルダをチェック
     if not os.path.exists(watch_folder):
         logging.warning(f"監視フォルダが存在しません: {watch_folder}")
+        status_data['last_error'] = f"監視フォルダが存在しません: {watch_folder}"
+        update_status_file()
         return
     
     # txtファイルを検索
@@ -148,16 +197,30 @@ def main():
     config = load_config()
     interval = config["check_interval"]
     
+    # 状態を初期化
+    status_data['is_running'] = True
+    status_data['processed_count'] = 0
+    status_data['error_count'] = 0
+    update_status_file()
+    
     logging.info(f"自動処理を開始（チェック間隔: {interval}秒）")
     
-    while True:
-        try:
-            check_and_process()
-        except Exception as e:
-            logging.error(f"エラー: {e}")
-        
-        logging.info(f"次のチェックまで{interval}秒待機...")
-        time.sleep(interval)
+    try:
+        while True:
+            try:
+                check_and_process()
+            except Exception as e:
+                logging.error(f"エラー: {e}")
+                status_data['error_count'] += 1
+                status_data['last_error'] = str(e)
+                update_status_file()
+            
+            logging.info(f"次のチェックまで{interval}秒待機...")
+            time.sleep(interval)
+    finally:
+        status_data['is_running'] = False
+        status_data['next_check'] = None
+        update_status_file()
 
 if __name__ == "__main__":
     try:
