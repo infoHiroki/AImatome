@@ -78,12 +78,16 @@ python auto_processor.py
   "output_folder": "output",
   "processed_folder": "archive",
   "check_interval": 30,
-  "system_prompt": "議事録生成プロンプト..."
+  "system_prompt": "議事録生成プロンプト...",
+  "model": "gpt-4-turbo",
+  "max_tokens": 4096,
+  "temperature": 0.3
 }
 ```
 
 ※ フォルダパスには相対パスまたは絶対パス（例: "C:\\Users\\xxxx\\Documents\\Output"）が指定可能です。
 ※ check_intervalはチェック間隔（分）を表します。
+※ モデルの変更方法については `モデル情報.txt` を参照してください。
 
 ### 生成される議事録の形式
 ```
