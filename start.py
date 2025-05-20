@@ -2,8 +2,10 @@ import os
 import time
 import sys
 import subprocess
-import signal
 from datetime import datetime
+
+# msvcrtはWindows専用のモジュール
+import msvcrt
 
 # プロセス管理用の変数
 processor_process = None
@@ -11,7 +13,7 @@ is_processing = False
 
 def clear_screen():
     """画面をクリアする"""
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system('cls')
 
 def parse_status_file():
     """ステータスファイルを解析する"""
@@ -187,12 +189,10 @@ def start_processor():
             if not os.path.exists(script_path):
                 return f"エラー: {script_path} が見つかりません"
             
-            # Windowsでは新しいコンソールウィンドウを作成せずに実行
-            startupinfo = None
-            if os.name == 'nt':
-                startupinfo = subprocess.STARTUPINFO()
-                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-                startupinfo.wShowWindow = 0  # SW_HIDE
+            # 新しいコンソールウィンドウを作成せずに実行
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = 0  # SW_HIDE
             
             processor_process = subprocess.Popen(
                 [sys.executable, script_path],
@@ -213,14 +213,9 @@ def stop_processor():
     global processor_process, is_processing
     if is_processing and processor_process:
         try:
-            # Windowsの場合
-            if os.name == 'nt':
-                # TASKKILL を使用してプロセスツリーを終了
-                subprocess.run(['taskkill', '/F', '/T', '/PID', str(processor_process.pid)], 
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            else:
-                # Unix系の場合
-                os.killpg(os.getpgid(processor_process.pid), signal.SIGTERM)
+            # TASKKILL を使用してプロセスツリーを終了
+            subprocess.run(['taskkill', '/F', '/T', '/PID', str(processor_process.pid)], 
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             
             processor_process = None
             is_processing = False
@@ -233,13 +228,6 @@ def stop_processor():
 def main():
     """メイン関数"""
     message = "AImatomeモニターを起動しました"
-    
-    # msvcrtをインポート（Windowsでのキー入力用）
-    try:
-        import msvcrt
-    except ImportError:
-        print("msvcrtモジュールをインポートできません。Windowsでのみ実行できます。")
-        sys.exit(1)
     
     # メインループ
     while True:
