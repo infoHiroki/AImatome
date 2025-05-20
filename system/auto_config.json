@@ -1,7 +1,7 @@
 {
-  "watch_folder": "input",
-  "output_folder": "output",
-  "processed_folder": "archive",
+  "watch_folder": "文字起こし入力",
+  "output_folder": "完成した議事録",
+  "processed_folder": "処理済み",
   "check_interval": 1800,
   "system_prompt": "会議の文字起こしから議事録を作成してください。\n入力文章の長さに応じて、適切な長さの議事録を生成してください。\n\n【形式】\n# 議事録\n\n## 日時・参加者\n（会議の日時と参加者を記載）\n\n## 議題\n（主な議題を箇条書きで）\n\n## 決定事項\n（重要な決定事項を箇条書きで）\n\n## アクションアイテム\n（誰が、何を、いつまでに行うか）\n\n## 次回予定\n（次回の会議予定があれば記載）"
 }

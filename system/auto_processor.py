@@ -10,12 +10,6 @@ import openai
 import logging
 import sys
 
-# カスタムログフォーマッタ
-class SimpleFormatter(logging.Formatter):
-    def format(self, record):
-        timestamp = datetime.fromtimestamp(record.created).strftime('%H:%M')
-        return f"{timestamp} - {record.getMessage()}"
-
 # .envファイルから環境変数を読み込む
 load_dotenv()
 
@@ -23,22 +17,14 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # ロギング設定
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-# 既存のハンドラを削除
-for handler in logger.handlers[:]:
-    logger.removeHandler(handler)
-
-# ファイルハンドラ
-file_handler = logging.FileHandler('auto_processor.log')
-file_handler.setFormatter(SimpleFormatter())
-logger.addHandler(file_handler)
-
-# コンソールハンドラ
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(SimpleFormatter())
-logger.addHandler(console_handler)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('auto_processor.log'),
+        logging.StreamHandler()
+    ]
+)
 
 # 状態管理
 status_data = {
@@ -53,17 +39,18 @@ status_data = {
 def update_status_file():
     """ユーザー向けの状態ファイルを更新"""
     try:
-        status_text = f"""議事録自動生成システム 状況
+        status_text = f"""議事録自動生成システム 状態確認
 =================================
-最終チェック: {status_data['last_check'].strftime('%H時%M分') if status_data['last_check'] else 'まだ実行されていません'}
-次回予定: {status_data['next_check'].strftime('%H時%M分') if status_data['next_check'] else '---'}
+状態: {'実行中' if status_data['is_running'] else '停止中'}
+最終チェック: {status_data['last_check'].strftime('%Y年%m月%d日 %H時%M分') if status_data['last_check'] else 'まだ実行されていません'}
+次回チェック: {status_data['next_check'].strftime('%Y年%m月%d日 %H時%M分') if status_data['next_check'] else '---'}
 処理済みファイル数: {status_data['processed_count']}個
 エラー数: {status_data['error_count']}個
 最終エラー: {status_data['last_error'] or 'なし'}
 
-更新時刻: {datetime.now().strftime('%H時%M分')}
+更新時刻: {datetime.now().strftime('%Y年%m月%d日 %H時%M分%S秒')}
 """
-        status_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "status.txt")
+        status_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "現在の状態.txt")
         with open(status_path, "w", encoding="utf-8") as f:
             f.write(status_text)
     except Exception as e:
@@ -73,9 +60,9 @@ def load_config():
     """設定ファイルを読み込み"""
     config_file = "auto_config.json"
     default_config = {
-        "watch_folder": "input",
-        "output_folder": "output",
-        "processed_folder": "archive",
+        "watch_folder": "文字起こし入力",
+        "output_folder": "完成した議事録",
+        "processed_folder": "処理済み",
         "check_interval": 1800,  # 30分
         "system_prompt": "会議の文字起こしから議事録を作成してください。以下の形式で：\n\n# 議事録\n## 日時・参加者\n## 議題\n## 決定事項\n## アクションアイテム\n- 誰が、何を、いつまでに\n## 次回予定"
     }
@@ -140,7 +127,7 @@ def process_file(file_path, output_folder, processed_folder, config):
     # タイムスタンプを追加してユニークなファイル名にする（オプション）
     # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     # output_name = base_name.replace(".txt", f"_議事録_{timestamp}.txt")
-    output_name = base_name.replace(".txt", "_minutes.txt")
+    output_name = base_name.replace(".txt", "_議事録.txt")
     output_path = os.path.join(output_folder, output_name)
     
     # フォルダを作成
@@ -209,7 +196,6 @@ def main():
     """メイン処理ループ"""
     config = load_config()
     interval = config["check_interval"]
-    interval_minutes = interval // 60
     
     # 状態を初期化
     status_data['is_running'] = True
@@ -217,7 +203,7 @@ def main():
     status_data['error_count'] = 0
     update_status_file()
     
-    logging.info(f"自動処理を開始（チェック間隔: {interval_minutes}分）")
+    logging.info(f"自動処理を開始（チェック間隔: {interval}秒）")
     
     try:
         while True:
@@ -229,7 +215,7 @@ def main():
                 status_data['last_error'] = str(e)
                 update_status_file()
             
-            logging.info(f"次のチェックまで{interval_minutes}分待機...")
+            logging.info(f"次のチェックまで{interval}秒待機...")
             time.sleep(interval)
     finally:
         status_data['is_running'] = False
