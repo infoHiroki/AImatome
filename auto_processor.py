@@ -199,13 +199,21 @@ def process_file(file_path, output_folder, processed_folder, config):
         update_status_file()
         return False
 
+def resolve_path(config_path):
+    """絶対パスと相対パスを適切に解決する"""
+    if os.path.isabs(config_path):
+        return config_path
+    else:
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), config_path)
+
 def check_and_process():
     """新しいファイルをチェックして処理"""
     config = load_config()
-    # パス参照を修正
-    watch_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), config["watch_folder"])
-    output_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), config["output_folder"])
-    processed_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), config["processed_folder"])
+    
+    # パス参照の解決（絶対パスと相対パスの両方をサポート）
+    watch_folder = resolve_path(config["watch_folder"])
+    output_folder = resolve_path(config["output_folder"])
+    processed_folder = resolve_path(config["processed_folder"])
     
     # 状態を更新
     status_data['last_check'] = datetime.now()

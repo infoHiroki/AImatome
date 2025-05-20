@@ -77,10 +77,13 @@ python auto_processor.py
   "watch_folder": "input",
   "output_folder": "output",
   "processed_folder": "archive",
-  "check_interval": 1800,
+  "check_interval": 30,
   "system_prompt": "議事録生成プロンプト..."
 }
 ```
+
+※ フォルダパスには相対パスまたは絶対パス（例: "C:\\Users\\xxxx\\Documents\\Output"）が指定可能です。
+※ check_intervalはチェック間隔（分）を表します。
 
 ### 生成される議事録の形式
 ```
