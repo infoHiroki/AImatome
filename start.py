@@ -21,6 +21,8 @@ def parse_status_file():
     processed_count = 0
     error_count = 0
     last_error = None
+    current_processing = None  # 追加
+    last_processed = None      # 追加
     
     try:
         with open(status_path, "r", encoding="utf-8") as f:
@@ -48,19 +50,29 @@ def parse_status_file():
                     last_error = line.split(":", 1)[1].strip()
                     if last_error == "なし":
                         last_error = None
+                # 追加: 新しいステータス項目
+                elif "現在処理中:" in line:
+                    current_processing = line.split(":", 1)[1].strip()
+                    if current_processing == "なし":
+                        current_processing = None
+                elif "最後に処理したファイル:" in line:
+                    last_processed = line.split(":", 1)[1].strip()
+                    if last_processed == "まだファイルは処理されていません":
+                        last_processed = None
     except Exception as e:
         print(f"ステータスファイル読み込みエラー: {e}")
     
-    return last_check, next_check, processed_count, error_count, last_error
+    # 戻り値に新しいパラメータを追加
+    return last_check, next_check, processed_count, error_count, last_error, current_processing, last_processed
 
 def parse_log_file():
     """ログファイルを解析する"""
-    log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "system", "auto_processor.log")
+    log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "auto_processor.log")
     logs = []
     
     try:
         if os.path.exists(log_path):
-            # 複数のエンコーディングを試す
+            # UTF-8を最初に試し、それから他のエンコーディングを試す
             encodings = ['utf-8', 'shift_jis', 'cp932', 'euc_jp']
             for encoding in encodings:
                 try:
@@ -104,10 +116,13 @@ def draw_ui(status="停止中", message="", system_info=None, file_info=None, lo
     # システム情報
     print("システム情報:")
     if system_info:
-        last_check, next_check, processed_count, error_count, last_error = system_info
+        # アンパックの更新
+        last_check, next_check, processed_count, error_count, last_error, current_processing, last_processed = system_info
         print(f"  最終チェック: {last_check or '--'}")
         print(f"  次回予定: {next_check or '--'}")
         print(f"  処理済みファイル: {processed_count}個")
+        print(f"  現在処理中: {current_processing or 'なし'}")
+        print(f"  最後に処理: {last_processed or '--'}")
         print(f"  エラー数: {error_count}個")
         if last_error:
             print(f"  最終エラー: {last_error}")
@@ -166,7 +181,7 @@ def start_processor():
     if not is_processing:
         try:
             # サブプロセスとしてauto_processor.pyを実行
-            script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "system", "auto_processor.py")
+            script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "auto_processor.py")
             
             # スクリプトが存在するか確認
             if not os.path.exists(script_path):

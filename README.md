@@ -14,13 +14,13 @@ AImatomeは、文字起こしファイルから自動で議事録を生成する
 ## 一般ユーザー向け 使い方
 
 ### 1. 初期設定（初回のみ）
-「APIキー設定方法.txt」を参照して、`system/.env` ファイルにAPIキーを設定：
+「APIキー設定方法.txt」を参照して、`.env` ファイルにAPIキーを設定：
 ```
 OPENAI_API_KEY=あなたのAPIキー
 ```
 
 ### 2. システムの起動
-- **Windows**: `start.bat` をダブルクリック
+- **Windows**: `run.bat` をダブルクリック
 - **Mac**: `start.command` をダブルクリック
 
 ### 3. ファイルの処理
@@ -41,11 +41,9 @@ AImatome/
 ├── input/               # 入力ファイルを配置
 ├── output/              # 生成された議事録
 ├── archive/             # 処理後の元ファイル
-├── system/              # システムファイル（触らない）
-│   ├── auto_processor.py
-│   ├── auto_config.json
-│   ├── .env
-│   └── その他設定ファイル
+├── auto_processor.py    # メイン処理ファイル
+├── auto_config.json     # 設定ファイル
+├── .env                 # APIキー設定 
 ├── start.*              # 起動スクリプト
 └── status.txt           # 状態表示
 ```
@@ -70,7 +68,6 @@ OPENAI_API_KEY=あなたのAPIキー
 
 ### 直接実行
 ```bash
-cd system
 python auto_processor.py
 ```
 
@@ -101,7 +98,7 @@ python auto_processor.py
 - エラーが発生した場合は `status.txt` を確認
 - APIキーが正しく設定されているか確認
 - Python環境とライブラリがインストールされているか確認
-- `system/auto_processor.log` で詳細なログを確認
+- `auto_processor.log` で詳細なログを確認
 
 ## セキュリティについて
 - APIキーは絶対にGitHubなどに公開しないでください
