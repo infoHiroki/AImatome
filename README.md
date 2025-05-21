@@ -43,7 +43,8 @@ AImatome/
 ├── auto_processor.py    # メイン処理ファイル
 ├── auto_config.json     # 設定ファイル
 ├── .env                 # APIキー設定 
-├── start.*              # 起動スクリプト
+├── run.bat              # 起動バッチファイル
+├── start.py             # UIスクリプト
 └── status.txt           # 状態表示
 ```
 
